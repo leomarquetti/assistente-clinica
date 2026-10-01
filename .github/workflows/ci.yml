@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  gitleaks:
+    name: Verificação de Segredos (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar Gitleaks (Binário Nativo)
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.24.0/gitleaks_8.24.0_linux_x64.tar.gz | sudo tar -xz -C /usr/local/bin gitleaks
+
+      - name: Executar Gitleaks
+        run: |
+          gitleaks detect --verbose --config=.gitleaks.toml
+
+  qualidade-e-testes:
+    name: Qualidade, Tipagem e Testes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Instalar Dependências do Projeto
+        run: |
+          uv pip install --system -e ".[dev]"
+
+      - name: Verificação de Linting (Ruff)
+        run: |
+          ruff check .
+
+      - name: Verificação de Formatação (Ruff Format)
+        run: |
+          ruff format --check .
+
+      - name: Verificação de Tipagem Estática (Mypy)
+        run: |
+          mypy app tests
+
+      - name: Execução da Suite de Testes (Pytest)
+        run: |
+          pytest -v --cov=app tests/

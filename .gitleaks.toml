@@ -1,0 +1,20 @@
+# Configuração do Gitleaks para ignorar chaves de demonstração e documentação pública
+title = "Gitleaks config para Assistente Clínicas Demo"
+
+[allowlist]
+description = "Chaves públicas fictícias de demonstração documentadas no README e testes"
+stopwords = [
+    "demo-atendente-key",
+    "demo-gestor-key"
+]
+regexes = [
+    '''demo-atendente-key''',
+    '''demo-gestor-key'''
+]
+paths = [
+    '''README\.md''',
+    '''docs/.*''',
+    '''\.env\.example''',
+    '''app/config\.py''',
+    '''tests/.*'''
+]

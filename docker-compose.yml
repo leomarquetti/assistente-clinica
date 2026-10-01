@@ -1,0 +1,24 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clinica-assistente-demo
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_MODE=demo
+      - LLM_PROVIDER=mock
+      - STORAGE=sqlite
+      - SQLITE_DB_PATH=/app/data/clinic_demo.db
+      - CONFIDENCE_THRESHOLD=0.6
+      - API_KEY_ATENDENTE=demo-atendente-key
+      - API_KEY_GESTOR=demo-gestor-key
+      - RATE_LIMIT_DEFAULT=60/minute
+    volumes:
+      - clinic_data:/app/data
+
+volumes:
+  clinic_data:
+    driver: local
